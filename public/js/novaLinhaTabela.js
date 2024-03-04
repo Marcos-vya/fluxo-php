@@ -81,7 +81,7 @@ function inserirLinha() {
             </div>
             <div class="gridModal">
                 <span>Descrição</span>
-                <input id="swal-input2" class="swal2-input" placeholder="Descrição">
+                <textarea id="swal-input2" class="swal2-input"></textarea>
             </div>
             <div class="gridModal">
                 <span>Evento</span>
@@ -97,15 +97,21 @@ function inserirLinha() {
                 <div id="grupo-container-acao"></div>
                 <button onclick="crialinhaModal('acao')"><i class="bi bi-plus-lg"></i> Adicionar ação</button>
             </div>
+            <div>
+                <input type="checkbox" value="true" id="checkFinish"><label for="checkFinish">Finaliza Fluxo ?</label>
+            </div> 
         `,
         focusConfirm: false,
         preConfirm: () => {            
             return {
-                nomeDaEtapa: document.getElementById('swal-input1').value,
-                descricao: document.getElementById('swal-input2').value,
-                evento: document.getElementById('swal-input3').value,
-                condicoes: obterCondicoes(),
-                acoes: obterAcoes()
+                EtapasFluxo : {
+                    nomeDaEtapa: document.getElementById('swal-input1').value,
+                    descricao: document.getElementById('swal-input2').value,
+                    evento: document.getElementById('swal-input3').value,
+                    finaliza: document.getElementById('checkFinish').value,
+                    condicoes: obterCondicoes(),
+                    acoes: obterAcoes()
+                }
             };
         }
     }).then((result) => {
@@ -219,4 +225,114 @@ function crialinhaModal(grupo){
 
 function removelinhaModal(idLinha){
     return document.getElementById(`${idLinha}`).remove();
+}
+
+function inserirLinhaFluxo(){
+    Swal.fire({
+        title: 'Adicionar Fluxo',
+        allowOutsideClick: false,
+        showCloseButton: true,
+        html: `
+            <div class="gridModal">
+                <span>Nome da Etapa</span>
+                <input id="swal-input1" class="swal2-input" placeholder="Insira o nome da etapa">
+            </div>
+            <div class="gridModal">
+                <span>Descrição</span>
+                <input id="swal-input2" class="swal2-input" placeholder="Descrição">
+            </div>            
+        `,
+        focusConfirm: false,
+        preConfirm: () => {            
+            return {
+                fluxo: {
+                    nomeDoFluxo : document.getElementById('swal-input1').value,
+                    descricao : document.getElementById('swal-input2').value,
+                }
+            };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            //chama função para o back
+            var codeUnic = envioNovoFluxo();
+            const novaLinha = `
+                <tr id="">
+                    <td>${result.value.nomeDoFluxo}</td>
+                    <td>${result.value.descricao}</td>
+                    <td> <button id="btAdd" onclick="removerLinha(this)">Deletar</button> <button id="btAdd">Editar</button> <button id="btAdd" onclick="janelaEtapas('${codeUnic}')">Etapas</button></td>
+                </tr>
+            `;
+            // Inserir a nova linha na tabela
+            tabela.insertAdjacentHTML('beforeend', novaLinha);
+            // atualizarOrdem();
+        }
+    });
+}
+
+function envioNovoFluxo(){
+    /*
+        Gera no banco o Fluxo (insert)
+        retorna o id unico, qual é usado para
+        vincular as etapas
+    */
+    /*
+        $.ajax({
+            url: `Rota`,
+            type: 'POST',
+            success: function(data) {
+                sweetSuccess();
+                return data;
+            },
+            error: function(xhr, status, error) {            
+                console.error('Erro ao carregar etapas do fluxo:', error);            
+            }
+        });
+    */
+    return gerardorCodigoUnico();
+}
+
+function janelaEtapas(id) {
+    /*
+        Acessa a pagina etapas do Fluxo, 
+        faz uma query no banco pelo id do
+        fluxo e retorna todos as etapas
+    */
+
+    // $.ajax({
+    //     url: `/fluxo/${id}`,
+    //     type: 'GET',
+    //     success: function(data) {
+    //         console.log('Informações do fluxo:', data);            
+    //     },
+    //     error: function(xhr, status, error) {            
+    //         console.error('Erro ao carregar etapas do fluxo:', error);            
+    //     }
+    // });
+    window.location.href = `/fluxo/${id}`;
+}
+
+function sweetSuccess(){
+    Swal.fire({
+        icon: "success",
+        title: "Salvo com Sucesso !",
+        showConfirmButton: false,
+        timer: 1500
+      });
+}
+
+function montaModal(id){
+    /*
+        $.ajax({
+            url: `Rota`,
+            type: 'POST',
+            data : `${id}`
+            success: function(data) {
+                sweetSuccess();
+                return data;
+            },
+            error: function(xhr, status, error) {            
+                console.error('Erro ao carregar etapas do fluxo:', error);            
+            }
+        });
+    */
 }

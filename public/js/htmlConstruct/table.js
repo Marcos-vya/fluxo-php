@@ -1,6 +1,3 @@
-//import {elementosEtapa} from  '../data/tabelaEtapaFluxo.js';
-//import {elementosFluxo} from  '../data/tabelaFluxo.js';
-
 export function gerarHTML(elementos) {
     let html = '';
 

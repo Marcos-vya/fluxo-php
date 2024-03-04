@@ -15,8 +15,8 @@ use App\Http\Controllers\FluxoController;
 */
 
 Route::get('/', function () {
-    return view('etapasFluxo');
+    return view('listaFluxo');
 });
 
-Route::get('/fluxo/{id}', [UserProfileController::class, 'etapasFluxo'])->name('profile');
+Route::get('/fluxo/{id}', [FluxoController::class, 'etapasFluxo'])->name('etapasFluxo');
 

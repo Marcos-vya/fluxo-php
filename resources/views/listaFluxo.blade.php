@@ -19,31 +19,28 @@
     <section>
         <div class="content">
             <div class="">
-                <button onclick="inserirLinha()">Novo Fluxo</button>
+                <button onclick="inserirLinhaFluxo()">Novo Fluxo</button>
             </div>
         </div>
-        <div class="content-grid" id="bodyHtml">
-            
-           
+        <div class="content-grid" id="bodyHtml">           
         </div>
     </section>
-<script type="module" src="{{asset('js/data/tabelaFluxo.js')}}"></script>
-<script type="module"  src="{{asset('js/htmlConstruct/table.js')}}"></script>
-<script type="module">
-    import { gerarHTML } from '{{asset("js/htmlConstruct/table.js")}}';
-    import {elementosFluxo} from  '{{asset("js/data/tabelaFluxo.js")}}';
-
-    document.addEventListener('DOMContentLoaded', (event) => {        
+    <script type="module">
+        import { gerarHTML } from '{{asset("js/htmlConstruct/table.js")}}';
+        import {elementosFluxo} from  '{{asset("js/data/tabelaFluxo.js")}}';
         const htmlGerado = gerarHTML(elementosFluxo);
-        console.log(htmlGerado);
         document.getElementById('bodyHtml').innerHTML = htmlGerado;
-    });
-    setTimeout(() => {
-        var script = document.createElement('script');
-        script.type = 'module';
-        script.src = "{{asset('js/novaLinhaTabela.js')}}";
-        document.head.appendChild(script);
-    }, 500);
-</script>
+    </script>
+    <script>
+        setTimeout(() => {
+            window.tabela = document.getElementById('tabelaEtapas');
+            window.linhas = tabela.querySelectorAll('tr');
+
+            var script = document.createElement('script');
+            script.src = "{{asset('js/novaLinhaTabela.js')}}";
+            document.head.appendChild(script);
+
+        }, 500);
+    </script>    
 </body>
 </html>

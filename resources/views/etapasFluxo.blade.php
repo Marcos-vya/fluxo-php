@@ -136,23 +136,22 @@
             </table> -->  
         </div>
     </section>
-<script type="module"  src="{{asset('js/htmlConstruct/table.js')}}"></script>
-<script type="module">
-    import { gerarHTML } from '{{asset("js/htmlConstruct/table.js")}}';
-    import {elementosEtapa} from  '{{asset("js/data/tabelaEtapaFluxo.js")}}';      
-    const htmlGerado = gerarHTML(elementosEtapa);
-    document.getElementById('bodyHtml').innerHTML = htmlGerado;
-</script>
-<script>
-    setTimeout(() => {
-        window.tabela = document.getElementById('tabelaEtapas');
-        window.linhas = tabela.querySelectorAll('tr');
-        
-        var script = document.createElement('script');
-        script.src = "{{asset('js/novaLinhaTabela.js')}}";
-        document.head.appendChild(script);
-    }, 500);
+    <script type="module">
+        import { gerarHTML } from '{{asset("js/htmlConstruct/table.js")}}';
+        import {elementosEtapa} from  '{{asset("js/data/tabelaEtapaFluxo.js")}}';      
+        const htmlGerado = gerarHTML(elementosEtapa);
+        document.getElementById('bodyHtml').innerHTML = htmlGerado;
+    </script>
+    <script>
+        setTimeout(() => {
+            window.tabela = document.getElementById('tabelaEtapas');
+            window.linhas = tabela.querySelectorAll('tr');
+            
+            var script = document.createElement('script');
+            script.src = "{{asset('js/novaLinhaTabela.js')}}";
+            document.head.appendChild(script);
+        }, 500);
 
-</script>
+    </script>
 </body>
 </html>
