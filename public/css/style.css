@@ -1,0 +1,14 @@
+.content-grid{
+    display: grid;
+}
+
+td {
+    border: 1px solid white;
+    padding: 10px;
+    text-align: center;
+}
+
+.gridModal{
+    display: grid;
+    grid-template-areas: '1';
+}
