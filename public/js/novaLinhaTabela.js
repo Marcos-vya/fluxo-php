@@ -186,8 +186,8 @@ function crialinhaModal(grupo){
     if (grupo == 'condicao'){
         html = `
             <div id="${novoElemento}">
-                <select id="swal-input3" class="condicao-primeiro">
-                    <option value="">Selecione um evento</option>
+                <select id="swal-input3" onchange="atualizarOpcoesAcao()" class="condicao-primeiro">
+                    <option value=" ">Selecione um evento</option>
                     <option value="evento1">Evento 1</option>
                     <option value="evento2">Evento 2</option>
                 </select>
@@ -202,14 +202,12 @@ function crialinhaModal(grupo){
                     <option value="condicao4">Condição 4</option>
                 </select>
                 <button onclick="removelinhaModal('${novoElemento}')"><i class="bi bi-x"></i></button>
-            </div>`
+            </div>`;            
     } else if(grupo == 'acao'){
         html = `
         <div id="${novoElemento}">
             <select class="acao-primeiro">
-                <option value="">Selecione</option>
-                <option value="condicao1">Condição 1</option>
-                <option value="condicao2">Condição 2</option>
+                
             </select>
             <select class="acao-segundo">
                 <option value="">Selecione</option>
@@ -217,14 +215,16 @@ function crialinhaModal(grupo){
                 <option value="condicao4">Condição 4</option>
             </select>
             <button onclick="removelinhaModal('${novoElemento}')"><i class="bi bi-x"></i></button>
-        </div>`
+        </div>`;
     }
     //elementoPai.outerHTML  += html;
     elementoPai.insertAdjacentHTML('beforeend', html);
+    atualizarOpcoesAcao();  
 }
 
 function removelinhaModal(idLinha){
-    return document.getElementById(`${idLinha}`).remove();
+    atualizarOpcoesAcao();
+    document.getElementById(`${idLinha}`).remove();
 }
 
 function inserirLinhaFluxo(){
@@ -335,4 +335,26 @@ function montaModal(id){
             }
         });
     */
+}
+
+function atualizarOpcoesAcao() {
+    const acaoSelects = document.querySelectorAll('.acao-primeiro');
+    const condicaoSelects = document.querySelectorAll('.condicao-primeiro');
+    acaoSelects.forEach(acaoSelect => {
+        zerarSelect(acaoSelect);
+        condicaoSelects.forEach(condicaoSelect => {
+            const valorCondicao = condicaoSelect.value;
+            const textoCondicao = condicaoSelect.options[condicaoSelect.selectedIndex].text;            
+            if (valorCondicao) {
+                const novaOpcao = document.createElement('option');
+                novaOpcao.value = valorCondicao;
+                novaOpcao.textContent = textoCondicao;
+                acaoSelect.appendChild(novaOpcao);
+            }
+        });
+    });
+}
+
+function zerarSelect(elementoSelect) {
+    elementoSelect.innerHTML = '';
 }
