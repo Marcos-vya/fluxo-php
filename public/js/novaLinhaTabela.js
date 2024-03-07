@@ -6,11 +6,15 @@
 //     {id:4, title:'Telefone', typeC:'int', min:11, max:14},
 // ];
 
-// function contagemElementosEtapa(){
-//     const etapas = document.querySelectorAll(".elemento-etapa");
-//     const total = etapas.length;
-//     return total;
-// }
+function contagemElementosPai(idPai){
+    const elementoPai = document.getElementById(idPai);
+    if (elementoPai) {
+        const elementosFilhos = elementoPai.children;
+        return elementosFilhos.length;
+    } else {        
+        return 0;
+    }
+}
     let linhaArrastada = null;
     linhas.forEach(linha => {
         linha.addEventListener('dragstart', () => {
@@ -87,16 +91,10 @@ function inserirLinha() {
                 <span>Evento</span>
                 <input id="swal-input3" class="swal2-input" placeholder="Descrição">
             </div>
-            <div id="swal-input4-container">
-                <p>Condições</p>
-                <div id="grupo-container-condicao"></div>
-                <button onclick="crialinhaModal('condicao')"><i class="bi bi-plus-lg"></i> Adicionar condição</button>
+            <div class="accordion" id="index_acordeon${chaveElemento}">
+                
             </div>
-            <div id="swal-input5-container">
-                <p>Ações</p>
-                <div id="grupo-container-acao"></div>
-                <button onclick="crialinhaModal('acao')"><i class="bi bi-plus-lg"></i> Adicionar ação</button>
-            </div>
+            <button onclick="eventoAcordeon('index_acordeon${chaveElemento}')"><i class="bi bi-plus-lg"></i> Adicionar Elemento</button>
             <div>
                 <input type="checkbox" value="true" id="checkFinish"><label for="checkFinish">Finaliza Fluxo ?</label>
             </div> 
@@ -179,8 +177,8 @@ function obterAcoes() {
     });
 }
 
-function crialinhaModal(grupo){
-    const elementoPai = document.getElementById(`grupo-container-${grupo}`);
+function crialinhaModal(grupo,idGrupo){
+    const elementoPai = document.getElementById(`grupo-container-${grupo}-${idGrupo}`);
     let novoElemento = `index_acao_${(gerardorCodigoUnico())}`;
     let html;
     if (grupo == 'condicao'){
@@ -358,3 +356,42 @@ function atualizarOpcoesAcao() {
 function zerarSelect(elementoSelect) {
     elementoSelect.innerHTML = '';
 }
+
+//novo moda, sequencia com caract... pegando por evendo
+// retornando condicoes e acoes especificas.
+// efeito modal, altura - ler sweetalert{}
+
+
+function eventoAcordeon(id){
+    const idAcordeon = `indexAcordeon_${gerardorCodigoUnico()}`;
+    const html = `
+        <div class="card countAcordeon">
+            <div class="card-header" id="${idAcordeon}">
+                <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#cardAcord_${idAcordeon}" aria-expanded="false" aria-controls="cardAcord_${idAcordeon}">
+                    ${contagemElementosPai(id) + 1}
+                </button>
+                </h2>
+            </div>
+    
+            <div id="cardAcord_${idAcordeon}" class="collapse" aria-labelledby="${idAcordeon}" data-parent="#${idAcordeon}">
+                <div class="card-body">
+                    <div id="swal-input4-container">
+                        <p>Condições</p>
+                        <div id="grupo-container-condicao-cardAcord_${idAcordeon}"></div>
+                        <button onclick="crialinhaModal('condicao','cardAcord_${idAcordeon}')"><i class="bi bi-plus-lg"></i> Adicionar condição</button>
+                    </div>
+                    <div id="swal-input5-container">
+                        <p>Ações</p>
+                        <div id="grupo-container-acao-cardAcord_${idAcordeon}"></div>
+                        <button onclick="crialinhaModal('acao','cardAcord_${idAcordeon}')"><i class="bi bi-plus-lg"></i> Adicionar ação</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    document.getElementById(id).insertAdjacentHTML('beforeend', html);
+}
+
+//cada acordeon monta um objeto com consição e ação.
+//controller chatflow
