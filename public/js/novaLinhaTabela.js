@@ -128,7 +128,7 @@ function inserirLinha() {
             tabela.insertAdjacentHTML('beforeend', novaLinha);
             atualizarOrdem();
         }
-    });
+    });    
 }
 
 function removerLinha(botao) {
@@ -433,5 +433,4 @@ function lercondicoesEacoesGrPorAcordeão() {
     return acordeoes;
 }
 
-//montar o select no meio de cada consição, sempre que chamar um numero par
 //o bloco 2 esta pegando o selec do bloco 1- parte ação

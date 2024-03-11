@@ -8,12 +8,22 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/css/style.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <!-- bootstrap -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/rowreorder/1.2.7/css/rowReorder.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.min.js"></script>
+    <!-- bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/gh/jerosoler/Drawflow/dist/drawflow.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        table.dataTable tbody tr{
+            background: none;
+        }
+    </style>
 </head>
 <body style="background: black; color: white; padding: 10px;">
     <header>
@@ -139,13 +149,26 @@
             </table> -->  
         </div>
     </section>
+    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/rowreorder/1.2.7/js/dataTables.rowReorder.min.js"></script>
     <script type="module">
         import { gerarHTML } from '{{asset("js/htmlConstruct/table.js")}}';
         import {elementosEtapa} from  '{{asset("js/data/tabelaEtapaFluxo.js")}}';      
         const htmlGerado = gerarHTML(elementosEtapa);
         document.getElementById('bodyHtml').innerHTML = htmlGerado;
-    </script>
-    <script>
+        let tableDD = $('#divPai').DataTable();
+        // Adicione funcionalidade de drag and drop usando jQuery UI
+        $('#tabelaEtapas').sortable({
+            axis: 'y', // Apenas permite a reordenação vertical
+            cursor: 'move',
+            handle: 'td', // Use células da tabela como alça
+            update: function(event, ui) {
+                // Obtém a nova ordem das linhas
+                var newOrder = tableDD.rows({ order: 'current' }).data().toArray();
+                console.log(newOrder); // Exemplo de ação, pode ser substituído por sua própria lógica
+            }
+        }).disableSelection();
+
         setTimeout(() => {
             window.tabela = document.getElementById('tabelaEtapas');
             window.linhas = tabela.querySelectorAll('tr');
