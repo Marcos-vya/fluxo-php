@@ -6,56 +6,56 @@
 //     {id:4, title:'Telefone', typeC:'int', min:11, max:14},
 // ];
 
-function contagemElementosPai(idPai){
+function contagemElementosPai(idPai) {
     const elementoPai = document.getElementById(idPai);
     if (elementoPai) {
         const elementosFilhos = elementoPai.children;
         return elementosFilhos.length;
-    } else {        
+    } else {
         return 0;
     }
 }
-    let linhaArrastada = null;
-    linhas.forEach(linha => {
-        linha.addEventListener('dragstart', () => {
-            linhaArrastada = linha;
-            setTimeout(() => {
-                linha.style.display = 'none';
-            }, 0);
-        });
-
-        linha.addEventListener('dragend', () => {
-            linha.style.display = '';
-            linhaArrastada = null;
-            atualizarOrdem();
-        });
-
-        linha.addEventListener('dragover', e => {
-            e.preventDefault();
-            const posicao = obterPosicao(e.clientY);
-            const proximaLinha = obterProximaLinha(tabela, posicao);
-            if (proximaLinha !== linha && proximaLinha !== linha.nextSibling) {
-                tabela.insertBefore(linha, proximaLinha);
-            }
-        });
+let linhaArrastada = null;
+linhas.forEach(linha => {
+    linha.addEventListener('dragstart', () => {
+        linhaArrastada = linha;
+        setTimeout(() => {
+            linha.style.display = 'none';
+        }, 0);
     });
-   
-    function obterPosicao(y) {
-        const linhas = Array.from(tabela.querySelectorAll('tr:not([draggable="false"])'));
-        return linhas.reduce((resultado, linha) => {
-            const retangulo = linha.getBoundingClientRect();
-            const centro = retangulo.top + retangulo.height / 2;
-            if (y > centro) {
-                return { depois: linha };
-            } else {
-                return resultado.depois ? resultado : { antes: linha };
-            }
-        }, {});
-    }
 
-    function obterProximaLinha(tabela, posicao) {
-        return posicao.depois ? posicao.depois.nextSibling : posicao.antes;
-    }
+    linha.addEventListener('dragend', () => {
+        linha.style.display = '';
+        linhaArrastada = null;
+        atualizarOrdem();
+    });
+
+    linha.addEventListener('dragover', e => {
+        e.preventDefault();
+        const posicao = obterPosicao(e.clientY);
+        const proximaLinha = obterProximaLinha(tabela, posicao);
+        if (proximaLinha !== linha && proximaLinha !== linha.nextSibling) {
+            tabela.insertBefore(linha, proximaLinha);
+        }
+    });
+});
+
+function obterPosicao(y) {
+    const linhas = Array.from(tabela.querySelectorAll('tr:not([draggable="false"])'));
+    return linhas.reduce((resultado, linha) => {
+        const retangulo = linha.getBoundingClientRect();
+        const centro = retangulo.top + retangulo.height / 2;
+        if (y > centro) {
+            return { depois: linha };
+        } else {
+            return resultado.depois ? resultado : { antes: linha };
+        }
+    }, {});
+}
+
+function obterProximaLinha(tabela, posicao) {
+    return posicao.depois ? posicao.depois.nextSibling : posicao.antes;
+}
 
 function atualizarOrdem() {
     const ordemTds = tabela.querySelectorAll('.ordemNumero');
@@ -65,9 +65,9 @@ function atualizarOrdem() {
 }
 
 function gerardorCodigoUnico() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         const r = Math.random() * 16 | 0,
-              v = c == 'x' ? r : (r & 0x3 | 0x8);
+            v = c == 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
 }
@@ -100,15 +100,14 @@ function inserirLinha() {
             </div> 
         `,
         focusConfirm: false,
-        preConfirm: () => {            
+        preConfirm: () => {
             return {
-                EtapasFluxo : {
+                EtapasFluxo: {
                     nomeDaEtapa: document.getElementById('swal-input1').value,
                     descricao: document.getElementById('swal-input2').value,
                     evento: document.getElementById('swal-input3').value,
                     finaliza: document.getElementById('checkFinish').value,
-                    condicoes: obterCondicoes(),
-                    acoes: obterAcoes()
+                    elementos: lercondicoesEacoesGrPorAcordeão(),
                 }
             };
         }
@@ -138,52 +137,61 @@ function removerLinha(botao) {
     atualizarOrdem();
 }
 
-function obterCondicoes() {
-    const condicoes = [];
-    const condicaoDivs = document.querySelectorAll('#grupo-container-condicao > div');
-    condicaoDivs.forEach(div => {
-        const selectEvento = div.querySelector('.condicao-primeiro');
-        const selectCondicao = div.querySelector('.condicao-segundo');
-        const selectAcao = div.querySelector('.condicao-terceiro');
-
-        const eventoSelecionado = selectEvento.value;
-        const condicaoSelecionada = selectCondicao.value;
-        const acaoSelecionada = selectAcao.value;
-
-        condicoes.push({
-            evento: eventoSelecionado,
-            condicao: condicaoSelecionada,
-            acao: acaoSelecionada
-        });
+function obterCondicoes(id,grupo) {
+    const container = document.getElementById(`${id}`);
+    const condicoesDivs = (grupo == 'condicao') ? container.querySelectorAll('div[data-content]') : container.querySelectorAll('div');
+    let condicoesArray = [];
+    condicoesDivs.forEach((div) => {
+        const selects = div.querySelectorAll('select');
+        let condicaoObj = {};
+        if(grupo == 'condicao'){
+            if (selects.length === 1 && (selects[0].classList.contains('condicao-primeiro'))) {
+                const value = selects[0].value;            
+                condicaoObj['operadorLogico'] = value;
+            } else {            
+                selects.forEach((select) => {
+                    if (select.classList.contains('condicao-primeiro')) {
+                        condicaoObj['variavel'] = select.value;
+                    } else if (select.classList.contains('condicao-segundo')) {
+                        condicaoObj['operadorComparacao'] = select.value;
+                    } else if (select.classList.contains('condicao-terceiro')) {
+                        condicaoObj['ValorDeComparacao'] = select.value;
+                    }
+                });
+            }
+        }else{
+            selects.forEach((select) => {
+                if (select.classList.contains('acao-primeiro')) {
+                    condicaoObj['variavel'] = select.value;
+                } else if (select.classList.contains('acao-segundo')) {
+                    condicaoObj['operadorComparacao'] = select.value;
+                } 
+            });
+        }
+        condicoesArray.push(condicaoObj);
     });
-    return condicoes;
+    //const jsonCondicoes = JSON.stringify(condicoesArray);
+    //console.log(jsonCondicoes);
+    return condicoesArray;
 }
 
-function obterAcoes() {
-    const acoes = [];
-    const divsAcao = document.querySelectorAll('#grupo-container-acao > div');
-
-    divsAcao.forEach(div => {
-        const selectEvento = div.querySelector('.acao-primeiro');
-        const selectCondicao = div.querySelector('.acao-segundo');
-
-        const eventoSelecionado = selectEvento.value;
-        const condicaoSelecionada = selectCondicao.value;
-
-        acoes.push({
-            evento: eventoSelecionado,
-            condicao: condicaoSelecionada,
-        });
-    });
-}
-
-function crialinhaModal(grupo,idGrupo){
+function crialinhaModal(grupo, idGrupo) {
     const elementoPai = document.getElementById(`grupo-container-${grupo}-${idGrupo}`);
-    let novoElemento = `index_acao_${(gerardorCodigoUnico())}`;
+    let novoElemento = `index_${grupo}_${(gerardorCodigoUnico())}`;
     let html;
-    if (grupo == 'condicao'){
-        html = `
-            <div id="${novoElemento}">
+    if (grupo == 'condicao') {
+        var totalElementosDiv = document.getElementById(`grupo-container-condicao-${idGrupo}`).childElementCount + 1;
+        if (totalElementosDiv % 2 === 0 && totalElementosDiv != null) {
+            html = `<div data-content="indexCondi_${totalElementosDiv}" id="${novoElemento}">
+                        <select id="swal-input3" onchange="atualizarOpcoesAcao()" class="condicao-primeiro">                            
+                            <option value="AND">E</option>
+                            <option value="OR">OU</option>
+                        </select>
+                    <div>                 
+                `;
+        } else {
+            html = `
+            <div data-content="${totalElementosDiv}" id="${novoElemento}">
                 <select id="swal-input3" onchange="atualizarOpcoesAcao()" class="condicao-primeiro">
                     <option value=" ">Selecione um evento</option>
                     <option value="evento1">Evento 1</option>
@@ -200,8 +208,9 @@ function crialinhaModal(grupo,idGrupo){
                     <option value="condicao4">Condição 4</option>
                 </select>
                 <button onclick="removelinhaModal('${novoElemento}')"><i class="bi bi-x"></i></button>
-            </div>`;            
-    } else if(grupo == 'acao'){
+            </div>`;
+        }
+    } else if (grupo == 'acao') {
         html = `
         <div id="${novoElemento}">
             <select class="acao-primeiro">
@@ -217,15 +226,21 @@ function crialinhaModal(grupo,idGrupo){
     }
     //elementoPai.outerHTML  += html;
     elementoPai.insertAdjacentHTML('beforeend', html);
-    atualizarOpcoesAcao();  
-}
-
-function removelinhaModal(idLinha){
     atualizarOpcoesAcao();
-    document.getElementById(`${idLinha}`).remove();
 }
 
-function inserirLinhaFluxo(){
+function removelinhaModal(idLinha) {
+    //pegar o data-contet, chegar se for != de 1 apagar ele e o elemento acima.
+    const linha = document.getElementById(`${idLinha}`);
+    if (linha.dataset.content != 1 && linha.dataset.content) {
+        var elementoAcima = document.querySelector(`[data-content="indexCondi_${linha.dataset.content - 1}"]`)
+        elementoAcima.remove();
+    }
+    linha.remove();
+    atualizarOpcoesAcao();
+}
+
+function inserirLinhaFluxo() {
     Swal.fire({
         title: 'Adicionar Fluxo',
         allowOutsideClick: false,
@@ -241,11 +256,11 @@ function inserirLinhaFluxo(){
             </div>            
         `,
         focusConfirm: false,
-        preConfirm: () => {            
+        preConfirm: () => {
             return {
                 fluxo: {
-                    nomeDoFluxo : document.getElementById('swal-input1').value,
-                    descricao : document.getElementById('swal-input2').value,
+                    nomeDoFluxo: document.getElementById('swal-input1').value,
+                    descricao: document.getElementById('swal-input2').value,
                 }
             };
         }
@@ -267,7 +282,7 @@ function inserirLinhaFluxo(){
     });
 }
 
-function envioNovoFluxo(){
+function envioNovoFluxo() {
     /*
         Gera no banco o Fluxo (insert)
         retorna o id unico, qual é usado para
@@ -300,7 +315,7 @@ function janelaEtapas(id) {
     //     url: `/fluxo/${id}`,
     //     type: 'GET',
     //     success: function(data) {
-    //         console.log('Informações do fluxo:', data);            
+    //         console.log('InformacoesGr do fluxo:', data);            
     //     },
     //     error: function(xhr, status, error) {            
     //         console.error('Erro ao carregar etapas do fluxo:', error);            
@@ -309,16 +324,16 @@ function janelaEtapas(id) {
     window.location.href = `/fluxo/${id}`;
 }
 
-function sweetSuccess(){
+function sweetSuccess() {
     Swal.fire({
         icon: "success",
         title: "Salvo com Sucesso !",
         showConfirmButton: false,
         timer: 1500
-      });
+    });
 }
 
-function montaModal(id){
+function montaModal(id) {
     /*
         $.ajax({
             url: `Rota`,
@@ -342,7 +357,7 @@ function atualizarOpcoesAcao() {
         zerarSelect(acaoSelect);
         condicaoSelects.forEach(condicaoSelect => {
             const valorCondicao = condicaoSelect.value;
-            const textoCondicao = condicaoSelect.options[condicaoSelect.selectedIndex].text;            
+            const textoCondicao = condicaoSelect.options[condicaoSelect.selectedIndex].text;
             if (valorCondicao) {
                 const novaOpcao = document.createElement('option');
                 novaOpcao.value = valorCondicao;
@@ -362,7 +377,7 @@ function zerarSelect(elementoSelect) {
 // efeito modal, altura - ler sweetalert{}
 
 
-function eventoAcordeon(id){
+function eventoAcordeon(id) {
     const idAcordeon = `indexAcordeon_${gerardorCodigoUnico()}`;
     const html = `
         <div class="card countAcordeon">
@@ -377,12 +392,12 @@ function eventoAcordeon(id){
             <div id="cardAcord_${idAcordeon}" class="collapse" aria-labelledby="${idAcordeon}" data-parent="#${idAcordeon}">
                 <div class="card-body">
                     <div id="swal-input4-container">
-                        <p>Condições</p>
+                        <p>condicoes</p>
                         <div id="grupo-container-condicao-cardAcord_${idAcordeon}"></div>
                         <button onclick="crialinhaModal('condicao','cardAcord_${idAcordeon}')"><i class="bi bi-plus-lg"></i> Adicionar condição</button>
                     </div>
                     <div id="swal-input5-container">
-                        <p>Ações</p>
+                        <p>acoesGr</p>
                         <div id="grupo-container-acao-cardAcord_${idAcordeon}"></div>
                         <button onclick="crialinhaModal('acao','cardAcord_${idAcordeon}')"><i class="bi bi-plus-lg"></i> Adicionar ação</button>
                     </div>
@@ -391,7 +406,32 @@ function eventoAcordeon(id){
         </div>
     `;
     document.getElementById(id).insertAdjacentHTML('beforeend', html);
+    lercondicoesEacoesGrPorAcordeão();
 }
 
-//cada acordeon monta um objeto com consição e ação.
-//controller chatflow
+function lercondicoesEacoesGrPorAcordeão() {
+    var acordeoes = [];
+    var acordeonElementos = document.querySelectorAll('.countAcordeon');
+    acordeonElementos.forEach(function (acordeon) {
+        var acordeonObjeto = {
+            condicoesGr: [],
+            acoesGr: []
+        };
+        var condicoesGr = acordeon.querySelectorAll('[id^="grupo-container-condicao"]');
+        var acoesGr = acordeon.querySelectorAll('[id^="grupo-container-acao"]');
+        condicoesGr.forEach(function (condicao) {
+            acordeonObjeto.condicoesGr.push(obterCondicoes(condicao.id,'condicao'));
+        });
+
+        acoesGr.forEach(function(acao) {
+            acordeonObjeto.acoesGr.push(obterCondicoes(acao.id,'acao'));
+        });
+
+        acordeoes.push(acordeonObjeto);
+    });
+    //console.log(acordeoes);
+    return acordeoes;
+}
+
+//montar o select no meio de cada consição, sempre que chamar um numero par
+//o bloco 2 esta pegando o selec do bloco 1- parte ação
