@@ -156,16 +156,14 @@
         import {elementosEtapa} from  '{{asset("js/data/tabelaEtapaFluxo.js")}}';      
         const htmlGerado = gerarHTML(elementosEtapa);
         document.getElementById('bodyHtml').innerHTML = htmlGerado;
-        let tableDD = $('#divPai').DataTable();
-        // Adicione funcionalidade de drag and drop usando jQuery UI
+        let tableDD = $('#divPai').DataTable();        
         $('#tabelaEtapas').sortable({
-            axis: 'y', // Apenas permite a reordenação vertical
+            axis: 'y',
             cursor: 'move',
-            handle: 'td', // Use células da tabela como alça
+            handle: 'td',
             update: function(event, ui) {
-                // Obtém a nova ordem das linhas
                 var newOrder = tableDD.rows({ order: 'current' }).data().toArray();
-                console.log(newOrder); // Exemplo de ação, pode ser substituído por sua própria lógica
+                console.log(newOrder);
             }
         }).disableSelection();
 
